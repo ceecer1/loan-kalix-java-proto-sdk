@@ -2,7 +2,7 @@
 
 
 # Kalix Workshop - Loan application - Java
-Not supported by Lightbend in any conceivable way, not open for contributions. This example does not include the SDK changes introduced in the latest release notes at https://docs.kalix.io/reference/release-notes.html#_february_2024
+Not supported by Lightbend in any conceivable way, not open for contributions. 
 
 ## Prerequisite
 Java 11 or later<br>
