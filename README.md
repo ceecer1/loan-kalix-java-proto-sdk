@@ -1,75 +1,95 @@
 # loan-service
 
 
-## Designing
+# Kalix Workshop - Loan application - Java
+Not supported by Lightbend in any conceivable way, not open for contributions. This example does not include the SDK changes introduced in the latest release notes at https://docs.kalix.io/reference/release-notes.html#_february_2024
 
-While designing your service it is useful to read [designing services](https://docs.kalix.io/developing/development-process-proto.html)
+## Prerequisite
+Java 11 or later<br>
+Apache Maven 3.6 or higher<br>
+[Kalix CLI](https://docs.kalix.io/kalix/install-kalix.html) <br>
+Docker 20.10.14 or higher (to run locally)<br>
+You can use Kalix container registry as mentioned below <br>
+Access to the `gcr.io/kalix-public` container registry<br>
+cURL<br>
+IDE / editor<br>
 
+## Setup
+### Install Kalix cli
+### Create a kalix project from the cli
 
-## Developing
+Check login
+``kalix auth login
 
-This project has a bare-bones skeleton service ready to go, but in order to adapt and
-extend it, it may be useful to read up on [developing services](https://docs.kalix.io/services/)
-and in particular the [Java section](https://docs.kalix.io/java-protobuf/index.html)
+List kalix projects (if any you have created)
+```kalix projects list
 
+Let's create one if none:
 
-## Building
+Get Organization name
+```kalix organizations list
 
-You can use Maven to build your project, which will also take care of
-generating code based on the `.proto` definitions:
+Get the container registry URL (Go to the link for help if needed, https://docs.kalix.io/operations/container-registries.html)
+```kalix regions list --organization lightbend
 
-```shell
-mvn compile
+Create project
+```kalix projects new training --region aws-eu-central-1 --organization lightbend
+
+Set kalix current project (it shows 'training' as selected project in mine, yours is definitely something else you have created)
+```kalix config set project training
+
+## Create kickstart maven project
+
+```mvn archetype:generate \
+-DarchetypeGroupId=io.kalix \
+-DarchetypeArtifactId=kalix-maven-archetype \
+-DarchetypeVersion=1.5.2
 ```
+Define value for property 'groupId': `io.kx`<br>
+Define value for property 'artifactId': `loan-application` <br>
+Define value for property 'version' 1.0-SNAPSHOT: :<br>
+Define value for property 'package' io.kx: : `io.kx.loanapp`<br>
 
 
-## Running Locally
+## Update POM file
+
+Check if docker is running with version => 18.03
+```docker --version
+
+Configure container registry for your current project
+```kalix auth container-registry configure
+
+Show container registry URL
+```kalix container-registry print
+
+In `pom.xml`:
+<kalixContainerRegistry>kcr.eu-central-1.kalix.io</kalixContainerRegistry>
+<kalixOrganization>lightbend</kalixOrganization>
+<dockerImage>${kalixContainerRegistry}/${kalixOrganization}/training/${project.artifactId}</dockerImage>
 
 
-When running a Kalix service locally, we need to have its companion Kalix Runtime running alongside it.
-
-To start your service locally, run:
-
-```shell
-mvn kalix:runAll
-```
-
-This command will start your Kalix service and a companion Kalix Runtime as configured in [docker-compose.yml](./docker-compose.yml) file.
-
-> Note: if you're looking to use Google Pub/Sub, see comments inside [docker-compose.yml](./docker-compose.yml)
-> on how to enable a Google Pub/Sub emulator that Kalix Runtime will connect to.
-
-With both the Kalix Runtime and your service running, any defined endpoints should be available at `http://localhost:9000`. In addition to the defined gRPC interface, each method has a corresponding HTTP endpoint. Unless configured otherwise (see [Transcoding HTTP](https://docs.kalix.io/java-protobuf/writing-grpc-descriptors-protobuf.html#_transcoding_http)), this endpoint accepts POST requests at the path `/[package].[entity name]/[method]`. For example, using `curl`:
-
-```shell
-> curl -XPOST -H "Content-Type: application/json" localhost:9000/io.kx.loanapp.CounterService/GetCurrentCounter -d '{"counterId": "foo"}'
-The command handler for `GetCurrentCounter` is not implemented, yet
-```
-
-For example, using [`grpcurl`](https://github.com/fullstorydev/grpcurl):
-
-```shell
-> grpcurl -plaintext -d '{"counterId": "foo"}' localhost:9000 io.kx.loanapp.CounterService/GetCurrentCounter 
-ERROR:
-  Code: Unknown
-  Message: The command handler for `GetCurrentCounter` is not implemented, yet
-```
-
-> Note: The failure is to be expected if you have not yet provided an implementation of `GetCurrentCounter` in
-> your entity.
+## Import generated project in your IDE/editor
+<i><b>Delete all generated sample proto files after done</b></i>
 
 
-## Deploying
+## Compile and complete code generation
+```mvn clean compile
 
-To deploy your service, install the `kalix` CLI as documented in
-[Install Kalix](https://docs.kalix.io/kalix/install-kalix.html)
-and configure a Docker Registry to upload your docker image to.
 
-You will need to update the `dockerImage` property in the `pom.xml` and refer to
-[Configuring registries](https://docs.kalix.io/projects/container-registries.html)
-for more information on how to make your docker image available to Kalix.
+## After skeleton files generated for your entity, views or actions is completed, you can run it locally via the following command:
+``` mvn kalix:runAll
 
-Finally, you use the `kalix` CLI to create a project as described in [Create a new Project](https://docs.kalix.io/projects/create-project.html). Once you have a project you can deploy your service into the project either 
-by using `mvn deploy kalix:deploy` which will package, publish your docker image, and deploy your service to Kalix, 
-or by first packaging and publishing the docker image through `mvn deploy` and 
-then [deploying the image through the `kalix` CLI](https://docs.kalix.io/services/deploy-service.html#_deploy).
+## Alternatively you can run the following command which will open up a console in your default browser at http://localhost:3000, that is helpful in a lot of ways during application development:
+```kalix local run
+
+## Run the following to push image to Kalix container registry
+```mvn deploy
+
+## Deploy the Kalix service, use image tag from your earlier command log
+```kalix service deploy loan kcr.eu-central-1.kalix.io/lightbend/training/loan-app:1.0-SNAPSHOT-20240416024430
+
+
+## List kalix service (shows ready if it is ready otherwise unavailable, takes sometime to show it to Ready status)
+```kalix service list
+
+### Visit https://docs.kalix.io/ for additional help with developer documentation.
