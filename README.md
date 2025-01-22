@@ -86,10 +86,16 @@ In `pom.xml`:
 ```mvn deploy
 
 ## Deploy the Kalix service, use image tag from your earlier command log
-```kalix service deploy loan kcr.eu-central-1.kalix.io/lightbend/training/loan-app:1.0-SNAPSHOT-20240416024430
+```kalix service deploy loanservice ${replace_with_kalix_container_registry_image}
 
 
 ## List kalix service (shows ready if it is ready otherwise unavailable, takes sometime to show it to Ready status)
 ```kalix service list
 
 ### Visit https://docs.kalix.io/ for additional help with developer documentation.
+
+
+### Test some commands via grpcurl
+```kalix service proxy loanservice --grpcui
+
+
