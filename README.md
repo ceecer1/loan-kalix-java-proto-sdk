@@ -43,7 +43,7 @@ Set kalix current project (it shows 'training' as selected project in mine, your
 ```mvn archetype:generate \
 -DarchetypeGroupId=io.kalix \
 -DarchetypeArtifactId=kalix-maven-archetype \
--DarchetypeVersion=1.5.2
+-DarchetypeVersion=1.5.6
 ```
 Define value for property 'groupId': `io.kx`<br>
 Define value for property 'artifactId': `loan-application` <br>
